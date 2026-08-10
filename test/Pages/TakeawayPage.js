@@ -1,8 +1,86 @@
 const BasePage = require('./BasePage');
 
-class RetailSalesPage extends BasePage {
+class TakeawayPage extends BasePage {
 
-    get registerMenu() {
+    // get navigationDrawer() {
+    //     return $('//android.widget.ImageButton[@content-desc="Open navigation drawer"]');
+    // }
+
+    // get retailSalesMenu() {
+    //     return $('//androidx.recyclerview.widget.RecyclerView[@resource-id="ch.payyap.smartpos:id/lst_menu_items"]/android.view.ViewGroup[4]');
+    // }
+
+    get takeAwayButton() {
+        return $('//android.widget.Button[@content-desc="Take-away"]');
+    }
+
+    // get searchProductField() {
+    //     return $('id=ch.payyap.smartpos:id/input_edit_text_qr');
+    // }
+
+    // get firstProduct() {
+    //     return $('(//android.view.ViewGroup[@resource-id="ch.payyap.smartpos:id/swipe_reveal_layout"])[1]/android.widget.FrameLayout[1]/androidx.appcompat.widget.LinearLayoutCompat');
+    // }
+
+    // get selectedProductHeader() {
+    //     return $('//android.widget.LinearLayout[@resource-id="ch.payyap.smartpos:id/selected_products_header"]');
+    // }
+
+    // product(productName) {
+    //     return $(`//android.widget.TextView[@text="${productName}"]`);
+    // }
+
+    get placeOrderButton() {
+    return $('id=ch.payyap.smartpos:id/btnPlaceOrder');
+    }
+
+    get closeButton() {
+        return $('id=ch.payyap.smartpos:id/button_close');
+    }
+
+    get orderStatus() {
+    return $('id=ch.payyap.smartpos:id/tvOrderStatus');
+    }
+
+    // get registerMenu() {
+    //     return $('//androidx.recyclerview.widget.RecyclerView[@resource-id="ch.payyap.smartpos:id/lst_menu_items"]/android.view.ViewGroup[3]');
+    // }
+
+    get unlinkRegisterButton() {
+        return $('(//android.view.ViewGroup[@resource-id="ch.payyap.smartpos:id/swipe_reveal_layout"])[1]/android.widget.FrameLayout[1]/android.view.ViewGroup');
+    }
+
+    get unlinkRegisterOption() {
+        return $('//android.widget.TextView[@text="Unlink register"]');
+    }
+
+    get confirmButton() {
+        return $('//android.widget.Button[@resource-id="android:id/button1"]');
+    }
+
+    get selectRegisterButton() {
+        return $('(//android.view.ViewGroup[@resource-id="ch.payyap.smartpos:id/swipe_reveal_layout"])[2]/android.widget.FrameLayout[1]/android.view.ViewGroup');
+    }
+
+    get selectRegisterOption() {
+        return $('//android.widget.TextView[@text="Select register"]');
+    }
+
+    // get assignedText() {
+    //     return $('//android.widget.TextView[@text="Assigned"]');
+    // }
+
+    get saveCustomFieldsButton() {
+    return $('id=ch.payyap.smartpos:id/btnSaveCustomFields');
+    }
+
+    get addpayButton() {
+        return $('id=ch.payyap.smartpos:id/btnAddChanges');
+    }
+
+//Sales
+
+ get registerMenu() {
         return $('//androidx.recyclerview.widget.RecyclerView[@resource-id="ch.payyap.smartpos:id/lst_menu_items"]/android.view.ViewGroup[3]');
     }
 
@@ -62,7 +140,7 @@ class RetailSalesPage extends BasePage {
         return $('id=ch.payyap.smartpos:id/two');
     }
 
-    get confirmButton() {
+    get confirmedButton() {
         return $('//android.widget.TextView[@text="Confirm"]');
     }
 
@@ -144,115 +222,154 @@ product(productName) {
     );
 }
 
-get transactionMenu() {
-    return $('//androidx.recyclerview.widget.RecyclerView[@resource-id="ch.payyap.smartpos:id/lst_menu_items"]/android.view.ViewGroup[5]');
+get fragmentContainer() {
+    return $('//android.widget.FrameLayout[@resource-id="ch.payyap.smartpos:id/fragment_container"]/android.view.ViewGroup');
 }
 
-get firstTransaction() {
-    return $('//androidx.recyclerview.widget.RecyclerView[@resource-id="ch.payyap.smartpos:id/recycler_view_transactions"]/android.widget.LinearLayout[1]');
-}
+async unlinkAndSelectRegister() {
 
-get transactionItems() {
-    return $('//android.widget.TextView[@resource-id="ch.payyap.smartpos:id/transaction_items"]');
-}
-
-transactionAmount(amount) {
-    return $(
-        `(//android.widget.TextView[@text="CHF ${amount}"])[2]`
+    await this.click(
+        this.registerMenu,
+        "Click Register Menu"
     );
+
+    await this.click(
+        this.unlinkRegisterButton,
+        "Click Unlink Register"
+    );
+
+    await this.click(
+        this.unlinkRegisterOption,
+        "Click Unlink Register Option"
+    );
+
+    await this.click(
+        this.confirmButton,
+        "Confirm Unlink Register"
+    );
+
+    await this.click(
+        this.selectRegisterButton,
+        "Click Select Register"
+    );
+
+    await this.click(
+        this.selectRegisterOption,
+        "Click Select Register Option"
+    );
+
+    await this.click(
+        this.confirmButton,
+        "Confirm Register Selection"
+    );
+
+    await this.assignedText.waitForDisplayed({ timeout: 10000 });
+    await expect(this.assignedText).toBeDisplayed();
+
 }
 
-    async createRetailSale(data) {
+    async openTakeaway() {
 
-        // await this.navigationDrawer.waitForDisplayed({
-        //     timeout: 80000
-        // });
-
-        //     await this.click(
-        //         this.navigationDrawer,
-        //         "Click Navigation Drawer"
-        //     );
-            
-        await this.registerMenu.waitForDisplayed({ timeout: 10000 });
-        await this.click(
-            this.registerMenu,
-            "Open Register Menu"
-        );
-
-        await this.firstRegister.waitForDisplayed({ timeout: 10000 });
-        await this.click(
-            this.firstRegister,
-            "Retail Register"
-        );
-
-        await this.selectRegisterText.waitForDisplayed({ timeout: 10000 });
-        await this.click(
-            this.selectRegisterText,
-            "Select Register"
-        );
-
-        await this.click(
-            this.okButton,
-            "Click OK"
-        );
-
-        await this.assignedText.waitForDisplayed({ timeout: 10000 });
-        await expect(this.assignedText).toBeDisplayed();
-
+        await this.navigationDrawer.waitForDisplayed({
+            timeout: 80000
+        });
         await this.click(
             this.navigationDrawer,
-            "Open Navigation Drawer"
+            "Click Navigation Drawer"
         );
 
-        await this.retailSalesMenu.waitForDisplayed({ timeout: 10000 });
+        await this.retailSalesMenu.waitForDisplayed({ timeout: 20000 });
         await this.click(
             this.retailSalesMenu,
-            "Open Retail Sales"
+            "Click Retail Sales"
         );
 
-    for (const productName of data.productNames) {
-
-    await this.searchProductField.waitForDisplayed({
-        timeout: 10000
-    });
-
-    await this.click(
-        this.searchProductField,
-        "Click Product Search"
-    );
-
-    await this.searchProductField.clearValue();
-
-    await driver.pause(500);
-
-    for (const char of productName) {
-        await driver.keys(char);
-        await driver.pause(500);
-    }
-
-    await driver.pause(1500);
-
-    const product = this.product(productName);
-
-    await product.waitForDisplayed({
-        timeout: 15000
-    });
-
-    await this.click(
-        product,
-        `Select Product : ${productName}`
-    );
-
-    await driver.pause(1000);
-}
-    
-        await this.selectedProductHeader.waitForDisplayed({ timeout: 10000 });
+        await this.takeAwayButton.waitForDisplayed({ timeout: 10000 });
         await this.click(
-            this.selectedProductHeader,
-            "Open Selected Products"
+            this.takeAwayButton,
+            "Select Take-away"
         );
-
     }
+
+    async selectProducts(data) {
+
+        for (const productName of data.productNames) {
+
+            await this.searchProductField.waitForDisplayed({
+                timeout: 10000
+            });
+
+            await this.click(
+                this.searchProductField,
+                "Click Product Search"
+            );
+
+            await this.searchProductField.clearValue();
+
+            await driver.pause(500);
+
+            for (const char of productName) {
+                await driver.keys(char);
+                await driver.pause(500);
+            }
+
+            await driver.pause(1500);
+
+            const product = this.product(productName);
+
+            await product.waitForDisplayed({
+                timeout: 15000
+            });
+
+            await this.click(
+                product,
+                `Select Product : ${productName}`
+            );
+
+            await driver.pause(1000);
+        }
+
+        // await this.selectedProductHeader.waitForDisplayed({
+        //     timeout: 10000
+        // });
+
+        // await this.click(
+        //     this.selectedProductHeader,
+        //     "Open Selected Products"
+        // );
+
+            await this.click(
+            this.placeOrderButton,
+            "Click Place Order"
+            );
+
+            await this.closeButton.waitForDisplayed({
+                timeout: 50000
+            });
+
+            await this.click(
+                this.closeButton,
+                "Click Close"
+            );
+
+            await this.orderStatus.waitForDisplayed({
+                timeout: 30000
+            });
+
+            await expect(this.orderStatus).toBeDisplayed();
+    }
+async saveCustomFields() {
+
+    await this.click(
+        this.saveCustomFieldsButton,
+        "Click Save Custom Fields"
+    );
+
+    await this.click(
+        this.addpayButton,
+        "Click pay"
+    );
+}
 
 async applyDiscount(data) {
 
@@ -309,16 +426,19 @@ async applyDiscount(data) {
     );
 
 }
-
-
 async CashPayment(data) {
 
+        if (await this.payButton.isExisting()) {
 
-        await this.payButton.waitForDisplayed({ timeout: 10000 });
+            await this.payButton.waitForDisplayed({
+                timeout: 3000
+            });
+
             await this.click(
                 this.payButton,
                 "Click Pay"
-        );
+            );
+        }
 
         await this.cashPayment.waitForDisplayed({ timeout: 30000 });
         await this.click(
@@ -326,13 +446,12 @@ async CashPayment(data) {
             "Select Payment Method"
         );
 
-        await this.paymentScreen.waitForDisplayed({ timeout: 10000 });
-        await expect(this.paymentScreen).toBeDisplayed();
 
-        await this.click(
-        this.noReceiptButton,
-        "Select No Receipt"
-        );
+        // await this.paymentScreen.waitForDisplayed({ timeout: 10000 });
+        // await expect(this.paymentScreen).toBeDisplayed();
+
+
+        
 
 }
 
@@ -551,19 +670,35 @@ async applyTipsAndConfirm(data) {
         }
 
         await this.click(
-            this.confirmButton,
-            "Click Confirm"
+            this.confirmedButton,
+            "Click Confirm Payment"
         );
 
         await this.paymentScreen.waitForDisplayed({ timeout: 10000 });
         await expect(this.paymentScreen).toBeDisplayed();
 
 
-        await this.noReceiptButton.waitForDisplayed({ timeout: 90000 });
-        await this.click(
-            this.noReceiptButton,
-            "Select No Receipt"
+        // await this.noReceiptButton.waitForDisplayed({ timeout: 90000 });
+        // await this.click(
+        //     this.noReceiptButton,
+        //     "Select No Receipt"
+        // );
+
+       await driver.pause(8000);
+
+       for (const productName of data.productNames) {
+
+            await this.verifyDisplayed(
+                this.product(productName),
+                `Verify Product : ${productName}`
+            );
+        }
+
+        await this.verifyDisplayed(
+            this.fragmentContainer,
+            "Verify Fragment Container"
         );
+
     }
 
 async processPayment(data) {
@@ -600,66 +735,6 @@ async processTips(data) {
     }
 }
 
-async transaction(data) {
-
-    await this.navigationDrawer.waitForDisplayed({
-            timeout: 30000
-        });
-
-    await this.click(
-        this.navigationDrawer,
-        "Click Navigation Drawer"
-    );
-
-    await this.transactionMenu.waitForDisplayed({
-        timeout: 30000
-    });
-
-    await this.click(
-        this.transactionMenu,
-        "Open Transactions"
-    );
-
-    await this.firstTransaction.waitForDisplayed({
-        timeout: 10000
-    });
-
-    await this.click(
-        this.firstTransaction,
-        "Open First Transaction"
-    );
-
-    // Verify Products
-    await this.transactionItems.waitForDisplayed({
-        timeout: 10000
-    });
-
-    const actualTransactionItems =
-        await this.transactionItems.getText();
-
-    for (const productName of data.productNames) {
-
-        expect(actualTransactionItems).toContain(
-            productName
-        );
-    }
-
-    // Calculate expected amount
-    const expectedAmount =
-        Number(data.cashAmount) +
-        Number(data.invoiceAmount);
-
-    // Verify Amount
-    const amount = this.transactionAmount(
-        expectedAmount.toFixed(2)
-    );
-
-    await amount.waitForDisplayed({
-        timeout: 10000
-    });
-
-    await expect(amount).toBeDisplayed();
-}
 }
 
-module.exports = new RetailSalesPage();
+module.exports = new TakeawayPage();

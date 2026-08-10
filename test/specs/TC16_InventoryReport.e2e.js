@@ -41,7 +41,7 @@ describe('Payyap Mobile', () => {
             emailData.email,
             // "Inventory Report",
             // "Report has been generated",
-            "The repport sent successfully"
+            "The report sent successfully"
         );
 
         // expect(mailVerified).toBe(true);

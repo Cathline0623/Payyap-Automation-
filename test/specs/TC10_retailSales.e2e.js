@@ -13,9 +13,9 @@ describe('Payyap Mobile', () => {
     await driver.activateApp('ch.payyap.smartpos');
     });
 
-    it('Create Retail Sale in Cash', async function () {
+    it('Create Retail Sale', async function () {
 
-        this.timeout(180000); 
+       this.timeout(180000); 
 
        await LoginPage.clickAllowPermission();
 
@@ -44,8 +44,13 @@ describe('Payyap Mobile', () => {
         // await RetailSalesPage.split(retailSalesData);
 
         //Transaction:
+        // await RetailSalesPage.transaction(retailSalesData);
+
+        await RetailSalesPage.createRetailSale(retailSalesData);
+        await RetailSalesPage.processDiscountNotes(retailSalesData);
+        await RetailSalesPage.processPayment(retailSalesData);
+        await RetailSalesPage.processTips(retailSalesData);
         await RetailSalesPage.transaction(retailSalesData);
-    
         
 
 

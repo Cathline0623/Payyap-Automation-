@@ -43,11 +43,32 @@ module.exports = {
         "pasta",
         "dosadosa"
     ],
+    paymentMethod: "cash",
+    discount: "Yes",
+    tips: "Yes",
     tipOne: "10",
     tipTwo: "50",
     tipSelectionOne: "Yes",
     tipSelectionTwo: "No",
-    note: "Via cash",
+    note: "Via reatailsales",
+    giftCardNumber: "111111",
+    cashAmount: "200",
+    invoiceAmount: "122"
+    },
+
+    TakeawayData: {
+    productNames: [
+        "pasta",
+        "dosadosa"
+    ],
+    paymentMethod: "cash",
+    discount: "Yes",
+    tips: "Yes",
+    tipOne: "10",
+    tipTwo: "50",
+    tipSelectionOne: "Yes",
+    tipSelectionTwo: "No",
+    note: "Via restaurantsales",
     giftCardNumber: "111111",
     cashAmount: "200",
     invoiceAmount: "122"

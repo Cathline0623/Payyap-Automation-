@@ -157,7 +157,7 @@ async selectBranch(data) {
     );
 
 
-    // await browser.pause(9000);
+    await browser.pause(9000);
 
     // Open navigation drawer
     await this.navigationDrawer.waitForDisplayed({
