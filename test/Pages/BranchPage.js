@@ -145,16 +145,25 @@ async selectBranch(data) {
     await driver.keys("Enter");
 
     // Select searched branch
+    // const branchList = this.branch(data.branchName);
+
+    // await branchList.waitForDisplayed({
+    //     timeout: 30000
+    // });
+
+    // await this.click(
+    //     branchList,
+    //     `Select Branch : ${data.branchName}`
+    // );
+
     const branchList = this.branch(data.branchName);
 
     await branchList.waitForDisplayed({
         timeout: 30000
     });
 
-    await this.click(
-        branchList,
-        `Select Branch : ${data.branchName}`
-    );
+    await branchList.doubleClick();
+
 
 
     await browser.pause(9000);

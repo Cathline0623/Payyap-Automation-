@@ -61,9 +61,9 @@ module.exports = {
         "pasta",
         "dosadosa"
     ],
-    paymentMethod: "cash",
+    paymentMethod: "payWithInvoice",
     discount: "Yes",
-    tips: "Yes",
+    tips: "No",
     tipOne: "10",
     tipTwo: "50",
     tipSelectionOne: "Yes",

@@ -59,8 +59,8 @@ exports.config = {
     capabilities: [{
         platformName: 'Android',
         'appium:automationName': 'UiAutomator2',
-        'appium:deviceName': 'RZ8RC0SNT0T',
-        'appium:udid': 'RZ8RC0SNT0T',
+        // 'appium:deviceName': 'RZ8RC0SNT0T',
+        // 'appium:udid': 'RZ8RC0SNT0T',
         'appium:appPackage': 'ch.payyap.smartpos',
         'appium:appActivity': 'ch.payyap.smartpos.ui.activities.splash.SplashActivity',
         'appium:noReset': false

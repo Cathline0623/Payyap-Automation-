@@ -41,7 +41,6 @@ describe('Payyap Mobile', () => {
         await TakeawayPage.openTakeaway();
         await TakeawayPage.selectProducts(TakeawayData);
         await TakeawayPage.processDiscountNotes(TakeawayData);
-        await TakeawayPage.saveCustomFields();
         await TakeawayPage.processPayment(TakeawayData);
         await TakeawayPage.processTips(TakeawayData);
     

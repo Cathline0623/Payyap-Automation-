@@ -189,7 +189,7 @@ get selectedProductsHeaderIcon() {
 }
 
 get customerName() {
-    return $('//android.widget.TextView[@resource-id="ch.payyap.smartpos:id/customer_name" and @text="customer 2"]');
+    return $('//android.widget.TextView[@resource-id="ch.payyap.smartpos:id/tvName" and @text="customer 2"]');
 }
 
 get invoicePaymentMethod() {
@@ -224,6 +224,14 @@ product(productName) {
 
 get fragmentContainer() {
     return $('//android.widget.FrameLayout[@resource-id="ch.payyap.smartpos:id/fragment_container"]/android.view.ViewGroup');
+}
+
+get addCustomerButton() {
+    return $('id=ch.payyap.smartpos:id/menu_item_add_customer');
+}
+
+get submitButton() {
+    return $('id=ch.payyap.smartpos:id/buttonSubmit');
 }
 
 async unlinkAndSelectRegister() {
@@ -358,18 +366,6 @@ async unlinkAndSelectRegister() {
 
             await expect(this.orderStatus).toBeDisplayed();
     }
-async saveCustomFields() {
-
-    await this.click(
-        this.saveCustomFieldsButton,
-        "Click Save Custom Fields"
-    );
-
-    await this.click(
-        this.addpayButton,
-        "Click pay"
-    );
-}
 
 async applyDiscount(data) {
 
@@ -428,30 +424,21 @@ async applyDiscount(data) {
 }
 async CashPayment(data) {
 
-        if (await this.payButton.isExisting()) {
+        await this.click(
+        this.saveCustomFieldsButton,
+        "Click Save Custom Fields"
+        );
 
-            await this.payButton.waitForDisplayed({
-                timeout: 3000
-            });
-
-            await this.click(
-                this.payButton,
-                "Click Pay"
-            );
-        }
+        await this.click(
+            this.addpayButton,
+            "Click pay"
+        );
 
         await this.cashPayment.waitForDisplayed({ timeout: 30000 });
         await this.click(
             this.cashPayment,
             "Select Payment Method"
         );
-
-
-        // await this.paymentScreen.waitForDisplayed({ timeout: 10000 });
-        // await expect(this.paymentScreen).toBeDisplayed();
-
-
-        
 
 }
 
@@ -501,15 +488,24 @@ async payWithGiftCard(data) {
     );
 }
 
-async payWithInvoice() {
+async payWithInvoice(data) {
 
-    await this.selectedProductsHeaderIcon.waitForDisplayed({
-        timeout: 10000
+    // await this.selectedProductsHeaderIcon.waitForDisplayed({
+    //     timeout: 10000
+    // });
+
+    // await this.click(
+    //     this.selectedProductsHeaderIcon,
+    //     "Click Selected Products Header"
+    // );
+
+    await this.addCustomerButton.waitForDisplayed({
+    timeout: 10000
     });
 
     await this.click(
-        this.selectedProductsHeaderIcon,
-        "Click Selected Products Header"
+        this.addCustomerButton,
+        "Click Add Customer"
     );
 
     await this.customerName.waitForDisplayed({
@@ -521,11 +517,26 @@ async payWithInvoice() {
         "Select Customer"
     );
 
-    await this.payButton.waitForDisplayed({ timeout: 10000 });
-        await this.click(
-            this.payButton,
-            "Click Pay"
+    await this.submitButton.waitForDisplayed({
+    timeout: 10000
+    });
+
+    await this.click(
+        this.submitButton,
+        "Click Submit"
     );
+
+    await this.click(
+        this.saveCustomFieldsButton,
+        "Click Save Custom Fields"
+    );
+
+    await this.addpayButton.waitForDisplayed({ timeout: 10000 });
+
+    await this.click(
+            this.addpayButton,
+            "Click pay"
+        );
 
     await this.invoicePaymentMethod.waitForDisplayed({
         timeout: 30000
@@ -540,7 +551,7 @@ async payWithInvoice() {
         timeout: 10000
     });
 
-    // await expect(this.paymentScreen).toBeDisplayed();
+    await expect(this.paymentScreen).toBeDisplayed();
 
     // await this.noReceiptButton.waitForDisplayed({
     //     timeout: 10000
@@ -550,6 +561,23 @@ async payWithInvoice() {
     //     this.noReceiptButton,
     //     "Select No Receipt"
     // );
+
+    await driver.pause(8000);
+
+       for (const productName of data.productNames) {
+
+            await this.verifyDisplayed(
+                this.product(productName),
+                `Verify Product : ${productName}`
+            );
+        }
+
+        await this.verifyDisplayed(
+            this.fragmentContainer,
+            "Verify Fragment Container"
+        );
+
+        
 }
 
 async split(data) {
@@ -571,6 +599,8 @@ async split(data) {
         this.customerName,
         "Select Customer"
     );
+
+    
 
     await this.payButton.waitForDisplayed({ timeout: 10000 });
         await this.click(
