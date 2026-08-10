@@ -59,8 +59,14 @@ exports.config = {
     capabilities: [{
         platformName: 'Android',
         'appium:automationName': 'UiAutomator2',
+        
+        //Andorid Phone
         // 'appium:deviceName': 'RZ8RC0SNT0T',
         // 'appium:udid': 'RZ8RC0SNT0T',
+
+        //Android Emulator in GitHub
+        'appium:deviceName': 'Android Emulator',
+        
         'appium:appPackage': 'ch.payyap.smartpos',
         'appium:appActivity': 'ch.payyap.smartpos.ui.activities.splash.SplashActivity',
         'appium:noReset': false
@@ -104,7 +110,7 @@ exports.config = {
     //
     // Default timeout in milliseconds for request
     // if browser driver or grid doesn't send response
-    connectionRetryTimeout: 120000,
+    connectionRetryTimeout: 180000,
     //
     // Default request retries count
     connectionRetryCount: 3,
