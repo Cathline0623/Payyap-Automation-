@@ -3,8 +3,9 @@ const LoginPage = require('../Pages/LoginPage');
 const HomePage = require('../Pages/HomePage');
 const TakeawayPage = require('../Pages/TakeawayPage');
 const BranchPage = require('../Pages/BranchPage');
+const SplitPeoplePage = require('../Pages/SplitPeoplePage');
 
-const { loginData,TakeawayData,branchData } = require('../Testdata/Data');
+const { loginData,TakeawayData,branchData,splitPeopleData } = require('../Testdata/Data');
 
 describe('Payyap Mobile', () => {
 
@@ -23,7 +24,7 @@ describe('Payyap Mobile', () => {
 
     });
 
-    it('Create Restaurant Sale', async function () {
+    it('Create Split by People ', async function () {
 
        this.timeout(180000); 
 
@@ -38,7 +39,7 @@ describe('Payyap Mobile', () => {
         await HomePage.Navigation();
         await BranchPage.selectBranch(branchData);
         await TakeawayPage.unlinkAndSelectRegister();
-        await TakeawayPage.openTakeaway();
+        
 
 
     });

@@ -74,6 +74,10 @@ module.exports = {
     invoiceAmount: "122"
     },
 
+    splitPeopleData : {
+    tableName: "table 1"
+    },
+
     tipData: {
         tipActivated: "Yes",
         cashEnabled: "Yes",
