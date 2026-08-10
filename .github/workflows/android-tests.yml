@@ -5,18 +5,35 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Appium & Dependencies
+        run: |
+          npm install
+          npm install -g appium
+          appium driver install uiautomator2
 
-      - name: Run tests
-        run: npx wdio run wdio.conf.js
+      - name: Run Android Emulator and WebdriverIO Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            appium &
+            npx wdio run wdio.conf.js
