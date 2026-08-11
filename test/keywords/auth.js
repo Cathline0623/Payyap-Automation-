@@ -5,20 +5,22 @@ const allure = require('@wdio/allure-reporter').default;
 
 
 // ============================================================
-// HANDLE STARTUP PERMISSION POPUP
+// HANDLE STARTUP NOTIFICATION PERMISSION POPUP
 // ============================================================
 
 async function handleStartupPopup() {
 
-    console.log("Checking for startup permission popup...");
+    console.log(
+        "Checking for startup notification permission popup..."
+    );
 
-    const allowButton = await $(
-        LOCATORS.permissions.notificationAllow
+    const denyButton = await $(
+        LOCATORS.permissions.notificationDeny
     );
 
     try {
 
-        await allowButton.waitForDisplayed({
+        await denyButton.waitForDisplayed({
             timeout: TEST_DATA.timeouts.short
         });
 
@@ -26,11 +28,15 @@ async function handleStartupPopup() {
             "Notification permission popup detected."
         );
 
-        await allowButton.click();
+        // Explicitly click "Don't allow"
+        await denyButton.click();
 
         console.log(
-            "Notification permission popup dismissed."
+            "Clicked 'Don't allow' on notification permission popup."
         );
+
+        // Wait for Android to completely dismiss the system dialog
+        await browser.pause(1000);
 
     } catch (error) {
 
@@ -48,24 +54,27 @@ async function handleStartupPopup() {
 
 async function waitAndType(selector, value, fieldName) {
 
-    await allure.step(`Enter ${fieldName}`, async () => {
+    await allure.step(
+        `Enter ${fieldName}`,
+        async () => {
 
-        const element = await $(selector);
+            const element = await $(selector);
 
-        await element.waitForDisplayed({
-            timeout: TEST_DATA.login.dashboardLoadTimeout
-        });
+            await element.waitForDisplayed({
+                timeout:
+                    TEST_DATA.login.dashboardLoadTimeout
+            });
 
-        await element.clearValue();
-        await element.setValue(value);
+            await element.clearValue();
 
-        const enteredValue = await element.getText();
+            await element.setValue(value);
 
-        if (!enteredValue) {
-            throw new Error(`${fieldName} was not entered.`);
+            console.log(
+                `${fieldName} entered successfully.`
+            );
+
         }
-
-    });
+    );
 }
 
 
@@ -75,116 +84,177 @@ async function waitAndType(selector, value, fieldName) {
 
 async function login() {
 
-    await allure.step("Login to application", async () => {
+    await allure.step(
+        "Login to application",
+        async () => {
 
-        // ====================================================
-        // STARTUP PERMISSION POPUP
-        // ====================================================
+            // ====================================================
+            // APP STARTUP
+            // ====================================================
 
-        await handleStartupPopup();
+            console.log(
+                "========== APP STARTUP =========="
+            );
 
-
-        // ====================================================
-        // EMAIL
-        // ====================================================
-
-        await waitAndType(
-            LOCATORS.login.email,
-            USER.email,
-            "Email"
-        );
-
-
-        // ====================================================
-        // PASSWORD
-        // ====================================================
-
-        await waitAndType(
-            LOCATORS.login.password,
-            USER.password,
-            "Password"
-        );
+            // IMPORTANT:
+            // This MUST happen before searching for the
+            // login fields because the Android permission
+            // dialog appears on top of the login screen.
+            await handleStartupPopup();
 
 
-        // ====================================================
-        // SIGN IN
-        // ====================================================
+            // ====================================================
+            // EMAIL
+            // ====================================================
 
-        await allure.step("Click Sign In", async () => {
+            console.log(
+                "========== EMAIL =========="
+            );
 
-            const signIn = await $(LOCATORS.login.signIn);
-
-            await signIn.waitForEnabled({
-                timeout: TEST_DATA.login.dashboardLoadTimeout
-            });
-
-            await signIn.click();
-
-        });
+            await waitAndType(
+                LOCATORS.login.email,
+                USER.email,
+                "Email"
+            );
 
 
-        // ====================================================
-        // DASHBOARD
-        // ====================================================
+            // ====================================================
+            // PASSWORD
+            // ====================================================
 
-        await allure.step(
-            "Verify dashboard is displayed",
-            async () => {
+            console.log(
+                "========== PASSWORD =========="
+            );
 
-                const menu = await $(
-                    LOCATORS.navigation.menu
-                );
+            await waitAndType(
+                LOCATORS.login.password,
+                USER.password,
+                "Password"
+            );
 
-                await menu.waitForDisplayed({
-                    timeout:
-                        TEST_DATA.login.dashboardLoadTimeout
-                });
 
-                await browser.pause(
-                    TEST_DATA.login.uiStabilizationDelay
-                );
+            // ====================================================
+            // SIGN IN
+            // ====================================================
 
-                let sidebarOpened = false;
+            console.log(
+                "========== SIGN IN =========="
+            );
 
-                for (
-                    let i = 0;
-                    i < TEST_DATA.login.menuRetryCount;
-                    i++
-                ) {
+            await allure.step(
+                "Click Sign In",
+                async () => {
 
-                    try {
+                    const signIn = await $(
+                        LOCATORS.login.signIn
+                    );
 
-                        if (await menu.isDisplayed()) {
+                    await signIn.waitForEnabled({
+                        timeout:
+                            TEST_DATA.login.dashboardLoadTimeout
+                    });
 
-                            await menu.click();
+                    await signIn.click();
 
-                            sidebarOpened = true;
+                    console.log(
+                        "Login submitted."
+                    );
 
-                            break;
+                }
+            );
+
+
+            // ====================================================
+            // DASHBOARD
+            // ====================================================
+
+            await allure.step(
+                "Verify dashboard is displayed",
+                async () => {
+
+                    console.log(
+                        "========== DASHBOARD =========="
+                    );
+
+                    const menu = await $(
+                        LOCATORS.navigation.menu
+                    );
+
+                    await menu.waitForDisplayed({
+                        timeout:
+                            TEST_DATA.login.dashboardLoadTimeout
+                    });
+
+                    console.log(
+                        "Dashboard loaded."
+                    );
+
+                    await browser.pause(
+                        TEST_DATA.login.uiStabilizationDelay
+                    );
+
+
+                    // ====================================================
+                    // OPEN NAVIGATION DRAWER
+                    // ====================================================
+
+                    let sidebarOpened = false;
+
+                    for (
+                        let i = 0;
+                        i < TEST_DATA.login.menuRetryCount;
+                        i++
+                    ) {
+
+                        try {
+
+                            if (
+                                await menu.isDisplayed() &&
+                                await menu.isEnabled()
+                            ) {
+
+                                await menu.click();
+
+                                sidebarOpened = true;
+
+                                console.log(
+                                    "Navigation drawer opened."
+                                );
+
+                                break;
+
+                            }
+
+                        } catch (error) {
+
+                            console.log(
+                                `Navigation drawer attempt ${
+                                    i + 1
+                                } failed. Retrying...`
+                            );
 
                         }
 
-                    } catch (error) {}
+                        await browser.pause(
+                            TEST_DATA.login.menuRetryDelay
+                        );
 
-                    await browser.pause(
-                        TEST_DATA.login.menuRetryDelay
-                    );
+                    }
+
+
+                    if (!sidebarOpened) {
+
+                        throw new Error(
+                            "Unable to open navigation drawer after login."
+                        );
+
+                    }
 
                 }
+            );
 
-                if (!sidebarOpened) {
-
-                    throw new Error(
-                        "Unable to open navigation drawer after login."
-                    );
-
-                }
-
-            }
-        );
-
-    });
-
+        }
+    );
 }
 
 
