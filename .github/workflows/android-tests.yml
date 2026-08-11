@@ -6,11 +6,29 @@ on:
 jobs:
   test:
     runs-on: self-hosted
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run WebdriverIO Tests
-        run: |
-          npm install
-          npx wdio run wdio.conf.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Kiosk Sales Flow Test
+        run: npx wdio run wdio.conf.js --spec ./test/specs/kiosk_sales_flow.js
+
+      - name: Generate Allure Report
+        if: always()
+        run: npx allure-commandline generate allure-results --clean -o allure-report
+
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: payyap-allure-report
+          path: allure-report/
