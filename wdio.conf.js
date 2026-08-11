@@ -58,11 +58,12 @@ exports.config = {
     //
     capabilities: [{
         platformName: 'Android',
-        'appium:deviceName': 'Android Emulator',
+        // 'appium:deviceName': 'Android Emulator',
+        'appium:udid': 'emulator-5554',
         'appium:automationName': 'UiAutomator2',
         'appium:platformVersion': '14',
         'appium:appPackage': 'ch.payyap.smartpos',
-        'appium:appActivity': 'YOUR_ACTUAL_ACTIVITY',
+        'appium:appActivity': '.MainActivity',
         'appium:autoGrantPermissions': true,
         'appium:uiautomator2ServerLaunchTimeout': 120000,
         'appium:uiautomator2ServerInstallTimeout': 120000,
@@ -76,7 +77,7 @@ exports.config = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'info',
+    logLevel: 'debug',
     //
     // Set specific log levels per logger
     // loggers:
