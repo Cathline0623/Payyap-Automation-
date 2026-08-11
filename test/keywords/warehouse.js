@@ -6,9 +6,8 @@ const {
     randomEmail
 } = require('../utils/randomData');
 
-async function createWarehouse() {
 
-    // Open Warehouses
+async function createWarehouse() {
 
     const warehouses = await $(LOCATORS.navigation.warehouses);
 
@@ -20,8 +19,6 @@ async function createWarehouse() {
 
     console.log("Warehouses opened.");
 
-    // Add Warehouse
-
     const add = await $(LOCATORS.warehouse.add);
 
     await add.waitForDisplayed({
@@ -30,7 +27,7 @@ async function createWarehouse() {
 
     await add.click();
 
-    // Warehouse Name
+    console.log("Add Warehouse form opened.");
 
     const warehouseName = randomWarehouseName();
 
@@ -42,51 +39,75 @@ async function createWarehouse() {
 
     await name.setValue(warehouseName);
 
-    if (!(await name.getText())) {
-        throw new Error("Warehouse name was not entered.");
+    const enteredName = await name.getAttribute("text");
+
+    if (enteredName !== warehouseName) {
+        throw new Error(
+            `Warehouse name was not entered correctly. ` +
+            `Expected: "${warehouseName}", Actual: "${enteredName}"`
+        );
     }
 
     console.log(`Warehouse Name: ${warehouseName}`);
 
-    // Address
-
     const address = await $(LOCATORS.warehouse.address);
+
+    await address.waitForDisplayed({
+        timeout: TEST_DATA.timeouts.medium
+    });
 
     await address.setValue("Automation Address");
 
-    if (!(await address.getText())) {
-        throw new Error("Warehouse address was not entered.");
+    const enteredAddress = await address.getAttribute("text");
+
+    if (enteredAddress !== "Automation Address") {
+        throw new Error(
+            `Warehouse address was not entered correctly. ` +
+            `Actual: "${enteredAddress}"`
+        );
     }
 
     console.log("Address entered.");
-
-    // Email
 
     const email = randomEmail();
 
     const emailField = await $(LOCATORS.warehouse.email);
 
+    await emailField.waitForDisplayed({
+        timeout: TEST_DATA.timeouts.medium
+    });
+
     await emailField.setValue(email);
 
-    if (!(await emailField.getText())) {
-        throw new Error("Warehouse email was not entered.");
+    const enteredEmail = await emailField.getAttribute("text");
+
+    if (enteredEmail !== email) {
+        throw new Error(
+            `Warehouse email was not entered correctly. ` +
+            `Expected: "${email}", Actual: "${enteredEmail}"`
+        );
     }
 
     console.log(`Email: ${email}`);
 
-    // Phone
-
     const phone = await $(LOCATORS.warehouse.phone);
+
+    await phone.waitForDisplayed({
+        timeout: TEST_DATA.timeouts.medium
+    });
 
     await phone.setValue(TEST_DATA.warehouse.phone);
 
-    if (!(await phone.getText())) {
-        throw new Error("Warehouse phone was not entered.");
+    const enteredPhone = await phone.getAttribute("text");
+
+    if (enteredPhone !== TEST_DATA.warehouse.phone) {
+        throw new Error(
+            `Warehouse phone was not entered correctly. ` +
+            `Expected: "${TEST_DATA.warehouse.phone}", Actual: "${enteredPhone}"`
+        );
     }
 
     console.log(`Phone: ${TEST_DATA.warehouse.phone}`);
-
-    // Save
 
     const save = await $(LOCATORS.warehouse.save);
 
@@ -96,11 +117,44 @@ async function createWarehouse() {
 
     await save.click();
 
-    console.log("Warehouse created successfully.");
+    console.log("Save clicked.");
+
+    await browser.waitUntil(
+        async () => {
+            return !(await name.isDisplayed().catch(() => false));
+        },
+        {
+            timeout: TEST_DATA.timeouts.long,
+            interval: 1000,
+            timeoutMsg:
+                "Warehouse form did not close after clicking Save."
+        }
+    );
+
+    console.log("Warehouse form closed.");
+
+    const createdWarehouse = await $(
+        `android=new UiSelector().text("${warehouseName}")`
+    );
+
+    await createdWarehouse.waitForDisplayed({
+        timeout: TEST_DATA.timeouts.long
+    });
+
+    if (!(await createdWarehouse.isDisplayed())) {
+        throw new Error(
+            `Created warehouse "${warehouseName}" was not found.`
+        );
+    }
+
+    console.log(
+        `VERIFIED: Warehouse "${warehouseName}" exists.`
+    );
+
 
     return warehouseName;
-
 }
+
 
 module.exports = {
     createWarehouse

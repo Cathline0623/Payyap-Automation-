@@ -46,24 +46,27 @@ exports.config = {
         timeout: 300000
     },
 
-    afterTest: async function (test, context, { error, passed }) {
+    afterTest: async function () {
 
-        if (!passed) {
+        try {
 
-            const screenshot = await browser.takeScreenshot();
+            console.log("Clearing Payyap app data...");
 
-            const allure = require('@wdio/allure-reporter').default;
+            await browser.execute('mobile: clearApp', {
+                appId: 'ch.payyap.smartpos'
+            });
 
-            allure.addAttachment(
-                'Failure Screenshot',
-                Buffer.from(screenshot, 'base64'),
-                'image/png'
+            console.log(
+                "Payyap app data cleared. Next test will start from login."
             );
 
-            console.log('Failure screenshot attached to Allure.');
+        } catch (error) {
+
+            console.log(
+                `Failed to clear Payyap app data: ${error.message}`
+            );
 
         }
-
     }
 
 };

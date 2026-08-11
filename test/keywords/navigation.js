@@ -55,7 +55,7 @@ async function selectTestBranch() {
             );
 
             await search.waitForDisplayed({
-                timeout: TEST_DATA.timeouts.medium
+                timeout: TEST_DATA.timeouts.long
             });
 
             await search.click();
@@ -72,6 +72,13 @@ async function selectTestBranch() {
                 `Branch search entered: "${TEST_DATA.branch.search}"`
             );
 
+            // IMPORTANT:
+            // Do NOT press Done.
+            // The Testing result appears while
+            // the keyboard is still open.
+
+            await browser.pause(1500);
+
         });
 
 
@@ -81,10 +88,12 @@ async function selectTestBranch() {
 
         await allure.step("Select Branch", async () => {
 
+            // Directly locate the visible Testing result.
+            // Do NOT use LOCATORS.branch.byName()
+            // because that was causing the "byName is not a function" error.
+
             const selectedBranch = await $(
-                LOCATORS.branch.byName(
-                    TEST_DATA.branch.name
-                )
+                `android=new UiSelector().text("${TEST_DATA.branch.name}")`
             );
 
             await selectedBranch.waitForDisplayed({
@@ -92,10 +101,14 @@ async function selectTestBranch() {
             });
 
             console.log(
-                `Selecting branch: ${TEST_DATA.branch.name}`
+                `Testing branch result displayed. Selecting: ${TEST_DATA.branch.name}`
             );
 
             await selectedBranch.click();
+
+            console.log(
+                `Testing branch selected: ${TEST_DATA.branch.name}`
+            );
 
         });
 
@@ -118,12 +131,16 @@ async function selectTestBranch() {
 
                 await menu.click();
 
+                console.log(
+                    "Navigation drawer reopened."
+                );
+
             }
         );
 
     });
-}
 
+}
 
 
 async function openBranchSettings() {
@@ -135,6 +152,7 @@ async function openBranchSettings() {
 
 }
 
+
 async function openRegisters() {
 
     await clickElement(
@@ -143,6 +161,7 @@ async function openRegisters() {
     );
 
 }
+
 
 async function openRestaurant() {
 
@@ -153,6 +172,7 @@ async function openRestaurant() {
 
 }
 
+
 async function openTables() {
 
     await clickElement(
@@ -161,6 +181,7 @@ async function openTables() {
     );
 
 }
+
 
 async function openCourses() {
 
@@ -171,6 +192,7 @@ async function openCourses() {
 
 }
 
+
 async function openCashInOut() {
 
     await clickElement(
@@ -179,6 +201,7 @@ async function openCashInOut() {
     );
 
 }
+
 
 module.exports = {
     selectTestBranch,

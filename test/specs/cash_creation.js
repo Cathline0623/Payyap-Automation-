@@ -14,22 +14,11 @@ describe('Cash In/Out', () => {
 
         console.log("========== CASH IN/OUT ==========");
 
-        // LOGIN
         await Auth.login();
-
-        // SELECT TESTING BRANCH
         await Navigation.selectTestBranch();
-
-        // OPEN BRANCH SETTINGS
         await Navigation.openBranchSettings();
-
-        // OPEN CASH IN/OUT
         await Navigation.openCashInOut();
-
-        // CASH IN
         await Cash.addCash("in");
-
-        // CASH OUT
         await Cash.addCash("out");
 
         console.log(

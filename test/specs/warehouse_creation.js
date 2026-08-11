@@ -2,34 +2,45 @@ const Auth = require('../keywords/auth');
 const Navigation = require('../keywords/navigation');
 const Warehouse = require('../keywords/warehouse');
 
-describe('Create New Register', () => {
+describe('Create New Warehouse', () => {
 
-    it('Creates a new register successfully', async function () {
+    it('Creates a new warehouse successfully', async function () {
 
         this.timeout(180000);
 
+        console.log("========== CREATE WAREHOUSE ==========");
         await Auth.login();
 
-await Navigation.selectTestBranch();
+        await Navigation.selectTestBranch();
 
-await Navigation.openBranchSettings();
+        await Navigation.openBranchSettings();
 
-const randomName = await Warehouse.createWarehouse();
+        const warehouseName =
+            await Warehouse.createWarehouse();
 
-        await browser.waitUntil(async () => {
+        const warehouse = await $(
+            `android=new UiSelector().text("${warehouseName}")`
+        );
 
-            const warehouse = await $(`android=new UiSelector().text("${randomName}")`);
-
-            return await warehouse.isDisplayed();
-
-        }, {
-
-            timeout: 20000,
-            interval: 1000
-
+        await warehouse.waitForDisplayed({
+            timeout: 20000
         });
 
-        console.log("Flow completed successfully.");
+        if (!(await warehouse.isDisplayed())) {
+            throw new Error(
+                `Final verification failed: ` +
+                `Warehouse "${warehouseName}" is not displayed.`
+            );
+        }
+
+
+        console.log(
+            `FINAL VERIFICATION PASSED: "${warehouseName}"`
+        );
+
+        console.log(
+            "========== WAREHOUSE CREATION COMPLETED =========="
+        );
 
     });
 
