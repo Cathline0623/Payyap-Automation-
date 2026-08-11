@@ -57,19 +57,13 @@ exports.config = {
     // https://saucelabs.com/platform/platform-configurator
     //
     capabilities: [{
-        platformName: 'Android',
-        'appium:automationName': 'UiAutomator2',
-        
-        //Andorid Phone
-        // 'appium:deviceName': 'RZ8RC0SNT0T',
-        // 'appium:udid': 'RZ8RC0SNT0T',
-
-        //Android Emulator in GitHub
+         platformName: 'Android',
         'appium:deviceName': 'Android Emulator',
-        
+        'appium:automationName': 'UiAutomator2',
+        'appium:platformVersion': '35',
         'appium:appPackage': 'ch.payyap.smartpos',
-        'appium:appActivity': 'ch.payyap.smartpos.ui.activities.splash.SplashActivity',
-        'appium:noReset': false
+        'appium:appActivity': 'YOUR_ACTIVITY',
+        'appium:autoGrantPermissions': true,
     }],
 
     //

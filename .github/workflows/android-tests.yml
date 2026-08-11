@@ -28,8 +28,37 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
           disable-animations: true
           script: |
+            echo "Checking Android emulator..."
+
+            adb wait-for-device
+
+            echo "Waiting for Android boot to complete..."
+
+            for i in {1..60}; do
+              BOOT_COMPLETED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+
+              if [ "$BOOT_COMPLETED" = "1" ]; then
+                echo "Android emulator boot completed."
+                break
+              fi
+
+              echo "Waiting for emulator... ($i/60)"
+              sleep 5
+            done
+
+            echo "Connected devices:"
             adb devices
+
+            echo "Android version:"
+            adb shell getprop ro.build.version.release
+
+            echo "SDK version:"
+            adb shell getprop ro.build.version.sdk
+
+            echo "Installing Payyap APK..."
             adb install -r Payyap.apk
+
+            echo "Starting WDIO tests..."
             npx wdio run wdio.conf.js --spec ./test/specs/TC01_LoginHome.e2e.js
 
       - name: Generate Allure Report
