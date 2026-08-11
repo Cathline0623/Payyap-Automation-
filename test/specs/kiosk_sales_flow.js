@@ -4,7 +4,7 @@ const TEST_DATA = require('../data/testData');
 
 describe('Sell Product - Cash Payment', () => {
 
-    it('Searches for bread and verifies search results', async function () {
+    it('Searches for bread and verifies search   results', async function () {
 
         this.timeout(180000);
 
@@ -23,7 +23,7 @@ describe('Sell Product - Cash Payment', () => {
 
         await email.waitForDisplayed({
             timeout: TEST_DATA.login.dashboardLoadTimeout
-        });
+        }); 
 
         await email.setValue(
             TEST_DATA.users.kiosk.email

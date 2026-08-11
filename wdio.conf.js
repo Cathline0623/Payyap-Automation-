@@ -14,7 +14,7 @@ exports.config = {
         'appium:udid': 'RZ8T50S0SRF',
         'appium:appPackage': 'ch.payyap.smartpos',
         'appium:appActivity': '.ui.activities.splash.SplashActivity',
-        'appium:noReset': true,
+        'appium:noReset': false,
         'appium:newCommandTimeout': 600,
         'appium:autoGrantPermissions': true
     }],
@@ -44,5 +44,28 @@ exports.config = {
     mochaOpts: {
         ui: 'bdd',
         timeout: 300000
+    },
+
+    afterTest: async function () {
+
+        try {
+
+            console.log("Clearing Payyap app data...");
+
+            await browser.execute('mobile: clearApp', {
+                appId: 'ch.payyap.smartpos'
+            });
+
+            console.log(
+                "Payyap app data cleared. Next test will start from login."
+            );
+
+        } catch (error) {
+
+            console.log(
+                `Failed to clear Payyap app data: ${error.message}`
+            );
+
+        }
     }
 };

@@ -18,35 +18,72 @@ async function handleStartupPopup() {
         LOCATORS.permissions.notificationDeny
     );
 
-    try {
+    const emailField = await $(
+        LOCATORS.login.email
+    );
 
-        await denyButton.waitForDisplayed({
-            timeout: TEST_DATA.timeouts.short
-        });
+    await browser.waitUntil(
+        async () => {
 
-        console.log(
-            "Notification permission popup detected."
-        );
+            // Check for notification popup
+            try {
 
-        // Explicitly click "Don't allow"
-        await denyButton.click();
+                if (await denyButton.isDisplayed()) {
 
-        console.log(
-            "Clicked 'Don't allow' on notification permission popup."
-        );
+                    console.log(
+                        "Notification permission popup detected."
+                    );
 
-        // Wait for Android to completely dismiss the system dialog
-        await browser.pause(1000);
+                    await denyButton.click();
 
-    } catch (error) {
+                    console.log(
+                        "Clicked 'Don't allow' on notification permission popup."
+                    );
 
-        console.log(
-            "No notification permission popup detected. Continuing..."
-        );
+                    await browser.pause(500);
 
-    }
+                    return true;
+                }
+
+            } catch (error) {
+                // Popup not available yet
+            }
+
+            // Check whether login screen is already available
+            try {
+
+                if (await emailField.isDisplayed()) {
+
+                    console.log(
+                        "Login screen already available. No permission popup."
+                    );
+
+                    return true;
+                }
+
+            } catch (error) {
+                // Login screen not available yet
+            }
+
+            return false;
+        },
+        {
+            timeout: TEST_DATA.login.dashboardLoadTimeout,
+            interval: 1000,
+            timeoutMsg:
+                "Neither notification permission popup nor login screen appeared."
+        }
+    );
+
+    // Make absolutely sure the login screen is ready
+    await emailField.waitForDisplayed({
+        timeout: TEST_DATA.login.dashboardLoadTimeout
+    });
+
+    console.log(
+        "Startup handling complete. Login screen is ready."
+    );
 }
-
 
 // ============================================================
 // WAIT AND TYPE
