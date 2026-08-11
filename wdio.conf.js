@@ -57,13 +57,16 @@ exports.config = {
     // https://saucelabs.com/platform/platform-configurator
     //
     capabilities: [{
-         platformName: 'Android',
+        platformName: 'Android',
         'appium:deviceName': 'Android Emulator',
         'appium:automationName': 'UiAutomator2',
         'appium:platformVersion': '14',
         'appium:appPackage': 'ch.payyap.smartpos',
         'appium:appActivity': 'YOUR_ACTUAL_ACTIVITY',
         'appium:autoGrantPermissions': true,
+        'appium:uiautomator2ServerLaunchTimeout': 120000,
+        'appium:uiautomator2ServerInstallTimeout': 120000,
+        'appium:adbExecTimeout': 120000
     }],
 
     //
@@ -107,7 +110,7 @@ exports.config = {
     connectionRetryTimeout: 180000,
     //
     // Default request retries count
-    connectionRetryCount: 3,
+    connectionRetryCount: 2,
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
@@ -115,12 +118,12 @@ exports.config = {
     // commands. Instead, they hook themselves up into the test process.
     // services: ['appium'],
     services: [
-    ['appium', {
-        args: {
-            allowInsecure: 'uiautomator2:adb_shell'
-        }
-    }]
-],
+        ['appium', {
+            args: {
+                allowInsecure: 'uiautomator2:adb_shell'
+            }
+        }]
+    ],
 
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
@@ -129,7 +132,7 @@ exports.config = {
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
     framework: 'mocha',
-    
+
     //
     // The number of times to retry the entire specfile when it fails as a whole
     // specFileRetries: 1,
@@ -144,16 +147,16 @@ exports.config = {
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
     reporters: [
-    'spec',
-    [
-        'allure',
-        {
-            outputDir: 'allure-results',
-            disableWebdriverStepsReporting: true,
-            disableWebdriverScreenshotsReporting: false
-        }
-    ]
-],
+        'spec',
+        [
+            'allure',
+            {
+                outputDir: 'allure-results',
+                disableWebdriverStepsReporting: true,
+                disableWebdriverScreenshotsReporting: false
+            }
+        ]
+    ],
 
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
@@ -257,16 +260,16 @@ exports.config = {
      * @param {object}  result.retries   information about spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
     afterTest: async function (test, context, { passed }) {
-    if (!passed) {
-        const screenshot = await browser.takeScreenshot();
+        if (!passed) {
+            const screenshot = await browser.takeScreenshot();
 
-        allure.addAttachment(
-            'Failure Screenshot',
-            Buffer.from(screenshot, 'base64'),
-            'image/png'
-        );
-    }
-},
+            allure.addAttachment(
+                'Failure Screenshot',
+                Buffer.from(screenshot, 'base64'),
+                'image/png'
+            );
+        }
+    },
 
 
     /**

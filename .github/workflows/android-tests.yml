@@ -33,6 +33,12 @@ jobs:
 
             adb wait-for-device
 
+            echo "Boot status:"
+            adb shell getprop sys.boot_completed
+
+            echo "Device boot status:"
+            adb shell getprop dev.bootcomplete
+
             echo "Connected devices:"
             adb devices
 
@@ -41,6 +47,9 @@ jobs:
 
             echo "SDK version:"
             adb shell getprop ro.build.version.sdk
+
+            echo "Checking Payyap package:"
+            adb shell pm list packages | grep ch.payyap.smartpos || true
 
             echo "Installing Payyap APK..."
             adb install -r Payyap.apk
