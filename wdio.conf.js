@@ -68,6 +68,7 @@ exports.config = {
         'appium:skipDeviceInitialization': true,
         'appium:uiautomator2ServerLaunchTimeout': 300000,
         'appium:uiautomator2ServerInstallTimeout': 300000,
+        'appium:uiautomator2ServerReadTimeout': 300000,
         'appium:adbExecTimeout': 300000
     }],
 
