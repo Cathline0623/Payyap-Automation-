@@ -118,12 +118,22 @@ exports.config = {
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
     // services: ['appium'],
+
+    // services: [
+    //     ['appium', {
+    //         args: {
+    //             allowInsecure: 'uiautomator2:adb_shell'
+    //         }
+    //     }]
+    // ],
+
     services: [
-        ['appium', {
-            args: {
-                allowInsecure: 'uiautomator2:adb_shell'
-            }
-        }]
+    ['appium', {
+        logPath: './appium.log',
+        args: {
+            allowInsecure: 'uiautomator2:adb_shell'
+        }
+    }]
     ],
 
     // Framework you want to run your specs with.
