@@ -60,9 +60,9 @@ exports.config = {
          platformName: 'Android',
         'appium:deviceName': 'Android Emulator',
         'appium:automationName': 'UiAutomator2',
-        'appium:platformVersion': '35',
+        'appium:platformVersion': '14',
         'appium:appPackage': 'ch.payyap.smartpos',
-        'appium:appActivity': 'YOUR_ACTIVITY',
+        'appium:appActivity': 'YOUR_ACTUAL_ACTIVITY',
         'appium:autoGrantPermissions': true,
     }],
 
