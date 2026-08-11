@@ -1,5 +1,10 @@
 module.exports = {
 
+    permissions: {
+    notificationAllow:
+        'id=com.android.permissioncontroller:id/permission_allow_button'
+},
+
     login: {
         email: 'id=ch.payyap.smartpos:id/sign_in_email_edit_text',
         password: 'id=ch.payyap.smartpos:id/sign_in_password_edit_text',

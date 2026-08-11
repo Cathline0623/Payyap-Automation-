@@ -3,6 +3,49 @@ const { USER } = require('../data/user');
 const TEST_DATA = require('../data/testData');
 const allure = require('@wdio/allure-reporter').default;
 
+
+// ============================================================
+// HANDLE STARTUP PERMISSION POPUP
+// ============================================================
+
+async function handleStartupPopup() {
+
+    console.log("Checking for startup permission popup...");
+
+    const allowButton = await $(
+        LOCATORS.permissions.notificationAllow
+    );
+
+    try {
+
+        await allowButton.waitForDisplayed({
+            timeout: TEST_DATA.timeouts.short
+        });
+
+        console.log(
+            "Notification permission popup detected."
+        );
+
+        await allowButton.click();
+
+        console.log(
+            "Notification permission popup dismissed."
+        );
+
+    } catch (error) {
+
+        console.log(
+            "No notification permission popup detected. Continuing..."
+        );
+
+    }
+}
+
+
+// ============================================================
+// WAIT AND TYPE
+// ============================================================
+
 async function waitAndType(selector, value, fieldName) {
 
     await allure.step(`Enter ${fieldName}`, async () => {
@@ -23,28 +66,50 @@ async function waitAndType(selector, value, fieldName) {
         }
 
     });
-
 }
+
+
+// ============================================================
+// LOGIN
+// ============================================================
 
 async function login() {
 
     await allure.step("Login to application", async () => {
 
-        // Email
+        // ====================================================
+        // STARTUP PERMISSION POPUP
+        // ====================================================
+
+        await handleStartupPopup();
+
+
+        // ====================================================
+        // EMAIL
+        // ====================================================
+
         await waitAndType(
             LOCATORS.login.email,
             USER.email,
             "Email"
         );
 
-        // Password
+
+        // ====================================================
+        // PASSWORD
+        // ====================================================
+
         await waitAndType(
             LOCATORS.login.password,
             USER.password,
             "Password"
         );
 
-        // Sign In
+
+        // ====================================================
+        // SIGN IN
+        // ====================================================
+
         await allure.step("Click Sign In", async () => {
 
             const signIn = await $(LOCATORS.login.signIn);
@@ -57,59 +122,77 @@ async function login() {
 
         });
 
-        // Dashboard
-        await allure.step("Verify dashboard is displayed", async () => {
 
-            const menu = await $(LOCATORS.navigation.menu);
+        // ====================================================
+        // DASHBOARD
+        // ====================================================
 
-            await menu.waitForDisplayed({
-                timeout: TEST_DATA.login.dashboardLoadTimeout
-            });
+        await allure.step(
+            "Verify dashboard is displayed",
+            async () => {
 
-            await browser.pause(
-                TEST_DATA.login.uiStabilizationDelay
-            );
+                const menu = await $(
+                    LOCATORS.navigation.menu
+                );
 
-            let sidebarOpened = false;
-
-            for (
-                let i = 0;
-                i < TEST_DATA.login.menuRetryCount;
-                i++
-            ) {
-
-                try {
-
-                    if (await menu.isDisplayed()) {
-
-                        await menu.click();
-
-                        sidebarOpened = true;
-
-                        break;
-
-                    }
-
-                } catch (error) {}
+                await menu.waitForDisplayed({
+                    timeout:
+                        TEST_DATA.login.dashboardLoadTimeout
+                });
 
                 await browser.pause(
-                    TEST_DATA.login.menuRetryDelay
+                    TEST_DATA.login.uiStabilizationDelay
                 );
 
-            }
+                let sidebarOpened = false;
 
-            if (!sidebarOpened) {
-                throw new Error(
-                    "Unable to open navigation drawer after login."
-                );
-            }
+                for (
+                    let i = 0;
+                    i < TEST_DATA.login.menuRetryCount;
+                    i++
+                ) {
 
-        });
+                    try {
+
+                        if (await menu.isDisplayed()) {
+
+                            await menu.click();
+
+                            sidebarOpened = true;
+
+                            break;
+
+                        }
+
+                    } catch (error) {}
+
+                    await browser.pause(
+                        TEST_DATA.login.menuRetryDelay
+                    );
+
+                }
+
+                if (!sidebarOpened) {
+
+                    throw new Error(
+                        "Unable to open navigation drawer after login."
+                    );
+
+                }
+
+            }
+        );
 
     });
 
 }
 
+
+// ============================================================
+// EXPORTS
+// ============================================================
+
 module.exports = {
-    login
+    login,
+    handleStartupPopup
 };
