@@ -58,17 +58,17 @@ exports.config = {
     //
     capabilities: [{
         platformName: 'Android',
-        // 'appium:deviceName': 'Android Emulator',
-        'appium:udid': 'emulator-5554',
+        'appium:deviceName': 'Android Emulator',
+        // 'appium:udid': 'emulator-5554',
         'appium:automationName': 'UiAutomator2',
         'appium:platformVersion': '14',
         'appium:appPackage': 'ch.payyap.smartpos',
         'appium:appActivity': '.MainActivity',
         'appium:autoGrantPermissions': true,
         'appium:skipDeviceInitialization': true,
-        'appium:uiautomator2ServerLaunchTimeout': 120000,
-        'appium:uiautomator2ServerInstallTimeout': 120000,
-        'appium:adbExecTimeout': 120000
+        'appium:uiautomator2ServerLaunchTimeout': 300000,
+        'appium:uiautomator2ServerInstallTimeout': 300000,
+        'appium:adbExecTimeout': 300000
     }],
 
     //
