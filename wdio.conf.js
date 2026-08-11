@@ -65,6 +65,7 @@ exports.config = {
         'appium:appPackage': 'ch.payyap.smartpos',
         'appium:appActivity': '.MainActivity',
         'appium:autoGrantPermissions': true,
+        'appium:skipDeviceInitialization': true,
         'appium:uiautomator2ServerLaunchTimeout': 120000,
         'appium:uiautomator2ServerInstallTimeout': 120000,
         'appium:adbExecTimeout': 120000
