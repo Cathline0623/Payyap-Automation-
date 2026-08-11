@@ -2,7 +2,10 @@ module.exports = {
 
     permissions: {
     notificationAllow:
-        'id=com.android.permissioncontroller:id/permission_allow_button'
+        'id=com.android.permissioncontroller:id/permission_allow_button',
+
+    notificationDeny:
+        'id=com.android.permissioncontroller:id/permission_deny_button'
 },
 
     login: {
