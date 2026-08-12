@@ -150,7 +150,7 @@ module.exports = {
     register: 'id=ch.payyap.smartpos:id/text_input_end_icon',
 
     // Register selection popup
-    registerSearch: 'id=ch.payyap.smartpos:id/tInSearch',
+    registerSearch: 'id=ch.payyap.smartpos:id/etSearch',
     registerList: 'id=ch.payyap.smartpos:id/rvItems',
     registerListItem: 'id=ch.payyap.smartpos:id/tvName',
 

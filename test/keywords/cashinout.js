@@ -6,11 +6,15 @@ const {
 } = require('../utils/randomData');
 
 
+// ============================================================
+// SELECT REGISTER
+// ============================================================
+
 async function selectRegister() {
 
-    // =========================================================
+    // ========================================================
     // OPEN REGISTER SELECTOR
-    // =========================================================
+    // ========================================================
 
     const register = await $(LOCATORS.cash.register);
 
@@ -23,9 +27,9 @@ async function selectRegister() {
     await register.click();
 
 
-    // =========================================================
+    // ========================================================
     // WAIT FOR REGISTER LIST
-    // =========================================================
+    // ========================================================
 
     const registerList = await $(LOCATORS.cash.registerList);
 
@@ -38,11 +42,12 @@ async function selectRegister() {
     console.log("Register list opened.");
 
 
-    // =========================================================
-    // GET ALL AVAILABLE REGISTERS
-    // =========================================================
+    // ========================================================
+    // GET AVAILABLE REGISTERS
+    // ========================================================
 
-    const registerElements = await $$(LOCATORS.cash.registerListItem);
+    const registerElements =
+        await $$(LOCATORS.cash.registerListItem);
 
     if (!registerElements.length) {
         throw new Error(
@@ -54,56 +59,67 @@ async function selectRegister() {
 
     for (const element of registerElements) {
 
-        const registerName = (
-            await element.getText()
-        ).trim();
+        try {
 
-        if (registerName) {
-            availableRegisters.push(registerName);
+            if (!(await element.isDisplayed())) {
+                continue;
+            }
+
+            const registerName =
+                (await element.getText()).trim();
+
+            if (registerName) {
+                availableRegisters.push(registerName);
+            }
+
+        } catch {
+            // Ignore stale/hidden elements
         }
     }
 
 
-    // Remove duplicates just in case the UI contains duplicates
+    // ========================================================
+    // REMOVE DUPLICATES
+    // ========================================================
+
     const uniqueRegisters = [
         ...new Set(availableRegisters)
     ];
 
+    if (!uniqueRegisters.length) {
+        throw new Error(
+            "Register list was displayed, but no visible register names were found."
+        );
+    }
 
     console.log(
         `Available registers: ${uniqueRegisters.join(", ")}`
     );
 
 
-    if (!uniqueRegisters.length) {
-        throw new Error(
-            "Register list was displayed, but no register names could be read."
+    // ========================================================
+    // RANDOMLY SELECT REGISTER
+    // ========================================================
+
+    const randomIndex =
+        Math.floor(
+            Math.random() * uniqueRegisters.length
         );
-    }
-
-
-    // =========================================================
-    // RANDOMLY SELECT ONE REGISTER
-    // =========================================================
-
-    const randomIndex = Math.floor(
-        Math.random() * uniqueRegisters.length
-    );
 
     const selectedRegister =
         uniqueRegisters[randomIndex];
-
 
     console.log(
         `Random register selected: "${selectedRegister}"`
     );
 
 
-    // =========================================================
-    // SEARCH FOR SELECTED REGISTER
-    // =========================================================
+    // ========================================================
+    // SEARCH REGISTER
+    // ========================================================
 
-    const search = await $(LOCATORS.cash.registerSearch);
+    const search =
+        await $(LOCATORS.cash.registerSearch);
 
     await search.waitForDisplayed({
         timeout: TEST_DATA.timeouts.medium
@@ -111,97 +127,223 @@ async function selectRegister() {
 
     await search.click();
 
+    await browser.pause(500);
+
     await search.clearValue();
 
-    await search.setValue(selectedRegister);
+    await browser.pause(300);
+
+
+    // ========================================================
+    // TYPE REGISTER NAME
+    // ========================================================
+
+    for (const character of selectedRegister) {
+
+        await driver.keys([character]);
+
+        await browser.pause(100);
+    }
 
     console.log(
         `Searching for register: "${selectedRegister}"`
     );
 
 
-    // =========================================================
-    // VERIFY ONLY THE SELECTED REGISTER IS SHOWN
-    // =========================================================
+    // ========================================================
+    // PRESS DONE
+    // ========================================================
+
+    await driver.keys(['Enter']);
+
+    console.log(
+        "Done pressed. Waiting for search results..."
+    );
+
+    await browser.pause(1500);
+
+
+    // ========================================================
+    // FIND EXACT RESULT INSIDE RECYCLERVIEW
+    // ========================================================
+    //
+    // Appium Inspector showed:
+    //
+    // rvItems
+    //   └── llRoot
+    //        ├── ImageView
+    //        └── tvName
+    //
+    // We therefore scope the search to rvItems.
+    //
+    // We do NOT search globally for tvName because Appium
+    // can expose duplicate TextView elements for the same
+    // visual result.
+    // ========================================================
+
+    const matchingRows = await $$(
+        `//androidx.recyclerview.widget.RecyclerView` +
+        `[@resource-id="ch.payyap.smartpos:id/rvItems"]` +
+        `//android.widget.LinearLayout` +
+        `[@resource-id="ch.payyap.smartpos:id/llRoot"]` +
+        `//android.widget.TextView` +
+        `[@resource-id="ch.payyap.smartpos:id/tvName"` +
+        ` and @text="${selectedRegister}"]` +
+        `/..`
+    );
+
+
+    // ========================================================
+    // WAIT UNTIL EXACT RESULT APPEARS
+    // ========================================================
 
     await browser.waitUntil(
         async () => {
 
-            const results = await $$(LOCATORS.cash.registerListItem);
+            try {
 
-            if (!results.length) {
+                const rows = await $$(
+                    `//androidx.recyclerview.widget.RecyclerView` +
+                    `[@resource-id="ch.payyap.smartpos:id/rvItems"]` +
+                    `//android.widget.LinearLayout` +
+                    `[@resource-id="ch.payyap.smartpos:id/llRoot"]` +
+                    `//android.widget.TextView` +
+                    `[@resource-id="ch.payyap.smartpos:id/tvName"` +
+                    ` and @text="${selectedRegister}"]` +
+                    `/..`
+                );
+
+                for (const row of rows) {
+
+                    try {
+
+                        if (await row.isDisplayed()) {
+                            return true;
+                        }
+
+                    } catch {
+                        // Ignore stale row
+                    }
+                }
+
+                return false;
+
+            } catch {
+
                 return false;
             }
 
-            const visibleNames = [];
-
-            for (const result of results) {
-
-                const text = (
-                    await result.getText()
-                ).trim();
-
-                if (text) {
-                    visibleNames.push(text);
-                }
-            }
-
-            console.log(
-                `Register search results: ${visibleNames.join(", ")}`
-            );
-
-            return (
-                visibleNames.length === 1 &&
-                visibleNames[0] === selectedRegister
-            );
         },
         {
             timeout: TEST_DATA.timeouts.long,
             interval: 500,
 
             timeoutMsg:
-                `Register "${selectedRegister}" was not the only search result.`
+                `Register "${selectedRegister}" did not appear in search results.`
         }
     );
 
 
+    // ========================================================
+    // GET VISIBLE EXACT MATCHES
+    // ========================================================
+
+    const exactMatches = [];
+
+    const currentRows = await $$(
+        `//androidx.recyclerview.widget.RecyclerView` +
+        `[@resource-id="ch.payyap.smartpos:id/rvItems"]` +
+        `//android.widget.LinearLayout` +
+        `[@resource-id="ch.payyap.smartpos:id/llRoot"]` +
+        `//android.widget.TextView` +
+        `[@resource-id="ch.payyap.smartpos:id/tvName"` +
+        ` and @text="${selectedRegister}"]` +
+        `/..`
+    );
+
+    for (const row of currentRows) {
+
+        try {
+
+            if (await row.isDisplayed()) {
+                exactMatches.push(row);
+            }
+
+        } catch {
+            // Ignore stale rows
+        }
+    }
+
+
+    // ========================================================
+    // VERIFY EXACTLY ONE RESULT
+    // ========================================================
+
+    if (exactMatches.length === 0) {
+
+        throw new Error(
+            `Register "${selectedRegister}" was not found in the search results.`
+        );
+    }
+
+    if (exactMatches.length > 1) {
+
+        throw new Error(
+            `Register "${selectedRegister}" was not the only search result. ` +
+            `Found ${exactMatches.length} exact visible matches inside rvItems.`
+        );
+    }
+
     console.log(
-        `Verified register search result: "${selectedRegister}"`
+        `Exactly one search result found for "${selectedRegister}".`
     );
 
 
-    // =========================================================
-    // CLICK THE REGISTER
-    // =========================================================
+    // ========================================================
+    // SELECT REGISTER ROW
+    // ========================================================
 
-    const selectedRegisterElement = await $(
-        LOCATORS.cash.registerByName(selectedRegister)
-    );
+    const selectedRegisterRow =
+        exactMatches[0];
 
-    await selectedRegisterElement.waitForDisplayed({
+    await selectedRegisterRow.waitForDisplayed({
         timeout: TEST_DATA.timeouts.medium
     });
 
-    await selectedRegisterElement.click();
+    console.log(
+        `Selecting register "${selectedRegister}"...`
+    );
+
+    await selectedRegisterRow.click();
 
     console.log(
-        `Register "${selectedRegister}" selected.`
+        `Register "${selectedRegister}" clicked.`
     );
 
 
-    // =========================================================
-    // SAVE REGISTER SELECTION
-    // =========================================================
+    // ========================================================
+    // WAIT FOR SAVE BUTTON
+    // ========================================================
 
-    const save = await $(LOCATORS.cash.registerSave);
+    const save =
+        await $(LOCATORS.cash.registerSave);
 
     await save.waitForDisplayed({
-        timeout: TEST_DATA.timeouts.medium
+        timeout: TEST_DATA.timeouts.long
     });
 
     await save.waitForEnabled({
         timeout: TEST_DATA.timeouts.medium
     });
+
+    console.log(
+        `Register "${selectedRegister}" selected successfully.`
+    );
+
+
+    // ========================================================
+    // CONFIRM REGISTER
+    // ========================================================
 
     await save.click();
 
@@ -214,6 +356,10 @@ async function selectRegister() {
 }
 
 
+// ============================================================
+// SELECT CASH TYPE
+// ============================================================
+
 async function selectCashType(type) {
 
     const selector =
@@ -221,7 +367,8 @@ async function selectCashType(type) {
             ? LOCATORS.cash.cashOut
             : LOCATORS.cash.cashIn;
 
-    const option = await $(selector);
+    const option =
+        await $(selector);
 
     await option.waitForDisplayed({
         timeout: TEST_DATA.timeouts.medium
@@ -229,23 +376,26 @@ async function selectCashType(type) {
 
     await option.click();
 
-    console.log(`Cash ${type} selected.`);
+    console.log(
+        `Cash ${type} selected.`
+    );
 }
 
 
+// ============================================================
+// ENTER CASH DETAILS
+// ============================================================
+
 async function enterCashDetails() {
 
-    const amount = randomAmount(
-        TEST_DATA.cash.minAmount,
-        TEST_DATA.cash.maxAmount
-    );
+    const amount =
+        randomAmount(
+            TEST_DATA.cash.minAmount,
+            TEST_DATA.cash.maxAmount
+        );
 
-
-    // =========================================================
-    // AMOUNT
-    // =========================================================
-
-    const amountField = await $(LOCATORS.cash.amount);
+    const amountField =
+        await $(LOCATORS.cash.amount);
 
     await amountField.waitForDisplayed({
         timeout: TEST_DATA.timeouts.medium
@@ -260,11 +410,8 @@ async function enterCashDetails() {
     );
 
 
-    // =========================================================
-    // NOTE
-    // =========================================================
-
-    const noteField = await $(LOCATORS.cash.note);
+    const noteField =
+        await $(LOCATORS.cash.note);
 
     await noteField.waitForDisplayed({
         timeout: TEST_DATA.timeouts.medium
@@ -285,9 +432,14 @@ async function enterCashDetails() {
 }
 
 
+// ============================================================
+// SAVE CASH TRANSACTION
+// ============================================================
+
 async function saveCash() {
 
-    const save = await $(LOCATORS.cash.save);
+    const save =
+        await $(LOCATORS.cash.save);
 
     await save.waitForEnabled({
         timeout: TEST_DATA.timeouts.medium
@@ -301,35 +453,44 @@ async function saveCash() {
 }
 
 
+// ============================================================
+// VERIFY CASH FORM CLOSED
+// ============================================================
+
 async function verifyCashFormClosed() {
 
-    const amountField = await $(LOCATORS.cash.amount);
+    const amountField =
+        await $(LOCATORS.cash.amount);
 
-    const formClosed = await browser.waitUntil(
-        async () => {
+    const formClosed =
+        await browser.waitUntil(
+            async () => {
 
-            try {
-                return !(await amountField.isDisplayed());
-            } catch {
-                return true;
+                try {
+
+                    return !(await amountField.isDisplayed());
+
+                } catch {
+
+                    return true;
+                }
+
+            },
+            {
+                timeout: TEST_DATA.timeouts.medium,
+                interval: 500
             }
-
-        },
-        {
-            timeout: TEST_DATA.timeouts.medium,
-            interval: 500
-        }
-    )
-    .then(() => true)
-    .catch(() => false);
+        )
+        .then(() => true)
+        .catch(() => false);
 
 
     if (!formClosed) {
+
         throw new Error(
             "Cash transaction form did not close after saving."
         );
     }
-
 
     console.log(
         "Cash transaction form closed."
@@ -337,13 +498,14 @@ async function verifyCashFormClosed() {
 }
 
 
+// ============================================================
+// ADD CASH
+// ============================================================
+
 async function addCash(type = "in") {
 
-    // =========================================================
-    // OPEN CASH FORM
-    // =========================================================
-
-    const addButton = await $(LOCATORS.cash.addButton);
+    const addButton =
+        await $(LOCATORS.cash.addButton);
 
     await addButton.waitForDisplayed({
         timeout: TEST_DATA.timeouts.medium
@@ -356,42 +518,46 @@ async function addCash(type = "in") {
     );
 
 
-    // =========================================================
-    // SELECT RANDOM REGISTER
-    // =========================================================
+    // ========================================================
+    // SELECT REGISTER
+    // ========================================================
 
     const selectedRegister =
         await selectRegister();
 
 
-    // =========================================================
+    // ========================================================
     // SELECT CASH TYPE
-    // =========================================================
+    // ========================================================
 
     await selectCashType(type);
 
 
-    // =========================================================
-    // ENTER CASH DETAILS
-    // =========================================================
+    // ========================================================
+    // ENTER AMOUNT + NOTE
+    // ========================================================
 
     const transaction =
         await enterCashDetails();
 
 
-    // =========================================================
+    // ========================================================
     // SAVE
-    // =========================================================
+    // ========================================================
 
     await saveCash();
 
 
-    // =========================================================
+    // ========================================================
     // VERIFY FORM CLOSED
-    // =========================================================
+    // ========================================================
 
     await verifyCashFormClosed();
 
+
+    // ========================================================
+    // COMPLETE
+    // ========================================================
 
     console.log(
         `Cash ${type} completed successfully. ` +
@@ -406,6 +572,10 @@ async function addCash(type = "in") {
     };
 }
 
+
+// ============================================================
+// EXPORT
+// ============================================================
 
 module.exports = {
     addCash
